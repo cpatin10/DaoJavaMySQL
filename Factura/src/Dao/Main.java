@@ -19,8 +19,10 @@ public class Main {
 		imprimirClientes(daoCliente);
 		
 		IDaoItem daoItem = new ItemDaoImp();
-		daoItem.agregar(new Item(0, new TipoItem(1), "Rico y delicioso", 2.5));
+		daoItem.agregar(new Item(0, new TipoItem(0), "Rico y delicioso", 2.5));
+		imprimirItems(daoItem);
 		daoItem.actualizar(new Item(0, new TipoItem("Carne"), "De res", 3.0));
+		imprimirItems(daoItem);
 		
 		
 		daoCliente.eliminar(0);
@@ -31,6 +33,13 @@ public class Main {
 		List<Cliente> clientes = daoCliente.obtener();
 		for (Cliente cliente: clientes) {
 			System.out.println(cliente.getNombre() + " " + cliente.getApellido());
+		}
+	}
+	
+	public static void imprimirItems(IDaoItem daoItem) {
+		List<Item> items = daoItem.obtener();
+		for (Item item: items) {
+			System.out.println(item.getIdItem() + " " + item.getTipo_Item().getTipo());
 		}
 	}
 }

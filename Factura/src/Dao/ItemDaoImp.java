@@ -67,8 +67,8 @@ public class ItemDaoImp implements IDaoItem {
 		String query = "UPDATE tienda.Item SET "
 				+ "descripcion='" + item.getDescripcion() + "', "
 				+ "valor='" + item.getValor() + "', "
-				+ "estado_civil='" + item.getTipo_Item().getIdTipo()
-				+ "' WHERE idCliente=" + item.getIdItem();
+				+ "tipo_item='" + item.getTipo_Item().getIdTipo()
+				+ "' WHERE idItem=" + item.getIdItem();
 		
 		return hacerQuery(query);
 	}
