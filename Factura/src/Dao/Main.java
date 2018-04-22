@@ -2,7 +2,6 @@ package Dao;
 
 import Modelos.*;
 import IDao.*;
-import Dao.*;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -64,6 +63,11 @@ public class Main {
 		daoFactura.agregar(f2);
 		
 		imprimirFacturas(daoFactura);
+		
+		items1.remove(sorpresa.getIdItem());
+		f1 = new Factura(0, new Date(2018, 4, 5), 7.0, "pagado", cata, items1);
+		
+		daoFactura.actualizar(f1);
 		
 		imprimirFactura(daoFactura.obtener(0));
 		System.out.println();

@@ -35,17 +35,8 @@ public class FacturaDaoImpl implements IDaoFactura {
 		
 		registroExitoso = hacerQuery(query);
 		
-		HashMap<Integer, Integer> itemList = factura.getItems();
-		
-		for (Map.Entry<Integer, Integer> item: itemList.entrySet()) {
-			query = "INSERT INTO tienda.Detalle_factura VALUES ( '"
-					+ idDetalleFactura++ + "','"
-					+ item.getKey() + "','"
-					+ factura.getIdFactura() + "','"
-					+ item.getValue() +  "')";
-			
-			registroExitoso = hacerQuery(query) && registroExitoso;			
-		}
+		registroExitoso = registrarItemsFacturaEnDetalleFactura(factura.getIdFactura(), 
+				factura.getItems(), registroExitoso);
 		
 		return registroExitoso;
 	}
@@ -120,24 +111,12 @@ public class FacturaDaoImpl implements IDaoFactura {
 		
 		registroExitoso = hacerQuery(query);
 		
-//		HashMap<Integer, Integer> itemList = factura.getItems();
-//		
-//		for (Map.Entry<Integer, Integer> item: itemList.entrySet()) {
-//			query = "INSERT INTO tienda.Detalle_factura VALUES ( '"
-//					+ idDetalleFactura++ + "','"
-//					+ item.getKey() + "','"
-//					+ factura.getIdFactura() + "','"
-//					+ item.getValue() +  "')";
-//			
-//			query = "UPDATE tienda.Detalle_factura SET "
-//					+ "fecha='" + new java.sql.Date(factura.getDate().getTime())+ "', "
-//					+ "cliente='" + factura.getCliente().getIdCliente() + "', "
-//					+ "total='" + factura.getTotal() + "', "
-//					+ "estado='" + factura.getEstado()
-//					+ "' WHERE idFactura=" + factura.getIdFactura();
-//			
-//			registroExitoso = hacerQuery(query) && registroExitoso;			
-//		}
+		query = queryEliminarItemsFacturaEnDetalleItems(factura.getIdFactura());
+		
+		registroExitoso = hacerQuery(query) && registroExitoso;
+		
+		registroExitoso = registrarItemsFacturaEnDetalleFactura(factura.getIdFactura(), 
+				factura.getItems(), registroExitoso) && registroExitoso;
 		
 		return registroExitoso;
 	}
@@ -147,14 +126,37 @@ public class FacturaDaoImpl implements IDaoFactura {
 		
 		String query;
 		boolean eliminacionExitosa = false;		
-		
-		query = "DELETE FROM tienda.Detalle_factura WHERE id_factura=" + idFactura;
+
+		query = queryEliminarItemsFacturaEnDetalleItems(idFactura);
 		
 		eliminacionExitosa = hacerQuery(query);
 		
 		query = "DELETE FROM tienda.Factura WHERE idFactura=" + idFactura;
 			
 		return hacerQuery(query) && eliminacionExitosa;	
+	}
+
+	private String queryEliminarItemsFacturaEnDetalleItems(int idFactura) {
+		String query;
+		query = "DELETE FROM tienda.Detalle_factura WHERE id_factura=" + idFactura;
+		return query;
+	}
+
+	private boolean registrarItemsFacturaEnDetalleFactura(int idFactura, 
+			HashMap<Integer, Integer> itemList, boolean registroExitoso) {
+		
+		String query;
+		
+		for (Map.Entry<Integer, Integer> item: itemList.entrySet()) {
+			query = "INSERT INTO tienda.Detalle_factura VALUES ( '"
+					+ idDetalleFactura++ + "','"
+					+ item.getKey() + "','"
+					+ idFactura + "','"
+					+ item.getValue() +  "')";
+			
+			registroExitoso = hacerQuery(query) && registroExitoso;			
+		}
+		return registroExitoso;
 	}
 	
 	private boolean hacerQuery(String query) {
