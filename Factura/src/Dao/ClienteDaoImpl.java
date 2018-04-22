@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Date;
 
 import Conexion.Conexion;
 import IDao.IDaoCliente;
@@ -26,8 +25,6 @@ public class ClienteDaoImpl implements IDaoCliente {
 				+ new java.sql.Date(cliente.getfechaNacimiento().getTime()) + "','"				
 				+ cliente.getEstadoCivil().getIdEstado() + "')";
 		
-		System.out.println(query);
-		
 		return hacerQuery(query);
 	}
 
@@ -36,36 +33,7 @@ public class ClienteDaoImpl implements IDaoCliente {
 		
 		String query = "SELECT * FROM tienda.Cliente ORDER BY idCliente";
 		
-		Statement statement = null;
-		Connection conexion = null;
-		ResultSet resultado = null;
-		
-		List<Cliente> listaClientes = new ArrayList<Cliente>();
-		
-		try {
-			conexion = Conexion.conectar();
-			statement = conexion.createStatement();
-			statement.execute(query);
-			resultado = statement.executeQuery(query);
-			while(resultado.next()){
-                Cliente es = new Cliente(
-                		resultado.getInt(1),
-                		resultado.getString(2),
-                		resultado.getString(3),
-                		resultado.getDate(5),
-                		resultado.getString(4),
-                		new EstadoCivil(resultado.getInt(6)));                
-                listaClientes.add(es);
-            }
-			statement.close();
-			resultado.close();
-			conexion.close();
-			
-		}catch(SQLException e){
-          System.out.println("a ocurrido un error: " + e);
-		}
-		
-		return listaClientes;
+		return selectClientes(query);
 	}
 
 	@Override
@@ -89,6 +57,14 @@ public class ClienteDaoImpl implements IDaoCliente {
 		
 		return hacerQuery(query);
 	}
+
+	@Override
+	public Cliente obtener(int idCliente) {
+		
+		String query = "SELECT * FROM tienda.Cliente WHERE idCliente=" + idCliente;
+		
+		return selectClientes(query).get(0);
+	}
 	
 	private boolean hacerQuery(String query) {
 		boolean registroExitoso = false;
@@ -108,6 +84,39 @@ public class ClienteDaoImpl implements IDaoCliente {
 		}
 		
 		return registroExitoso;
+	}
+	
+	private List<Cliente> selectClientes(String query) {
+		List<Cliente> listaClientes = new ArrayList<Cliente>();
+		
+		Statement statement = null;
+		Connection conexion = null;
+		ResultSet resultado = null;
+		
+		try {
+			conexion = Conexion.conectar();
+			statement = conexion.createStatement();
+			statement.execute(query);
+			resultado = statement.executeQuery(query);
+			while(resultado.next()){
+                Cliente es = new Cliente(
+                		resultado.getInt(1),
+                		resultado.getString(2),
+                		resultado.getString(3),
+                		resultado.getTime(5),
+                		resultado.getString(4),
+                		new EstadoCivil(resultado.getInt(6)));                
+                listaClientes.add(es);
+            }
+			statement.close();
+			resultado.close();
+			conexion.close();
+			
+		}catch(SQLException e){
+          System.out.println("a ocurrido un error: " + e);
+		}
+		
+		return listaClientes;
 	}
 
 }
