@@ -37,6 +37,14 @@ public class ClienteDaoImpl implements IDaoCliente {
 	}
 
 	@Override
+	public Cliente obtener(int idCliente) {
+		
+		String query = "SELECT * FROM tienda.Cliente WHERE idCliente=" + idCliente;
+		
+		return selectClientes(query).get(0);
+	}
+
+	@Override
 	public boolean actualizar(Cliente cliente) {
 		
 		String query = "UPDATE tienda.Cliente SET "
@@ -56,14 +64,6 @@ public class ClienteDaoImpl implements IDaoCliente {
 		String query = "DELETE FROM tienda.Cliente WHERE idCliente=" + idCliente;
 		
 		return hacerQuery(query);
-	}
-
-	@Override
-	public Cliente obtener(int idCliente) {
-		
-		String query = "SELECT * FROM tienda.Cliente WHERE idCliente=" + idCliente;
-		
-		return selectClientes(query).get(0);
 	}
 	
 	private boolean hacerQuery(String query) {

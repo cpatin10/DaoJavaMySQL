@@ -12,14 +12,9 @@ import java.util.Map;
 import Conexion.Conexion;
 import IDao.IDaoCliente;
 import IDao.IDaoFactura;
-import IDao.IDaoItem;
 import Modelos.Factura;
 import Modelos.Cliente;
-import Modelos.Item;
-import Modelos.TipoItem;
-import Modelos.EstadoCivil;
 import Dao.ClienteDaoImpl;
-import Dao.ItemDaoImpl;;
 
 public class FacturaDaoImpl implements IDaoFactura {
 	
@@ -60,104 +55,52 @@ public class FacturaDaoImpl implements IDaoFactura {
 		
 		String query = "SELECT * FROM tienda.Factura ORDER BY idFactura";
 		
-//		Statement statement = null;
-//		Connection conexion = null;
-//		ResultSet resultado = null;
-//		
-//		List<Factura> listaClientes = new ArrayList<Factura>();
-//		
-//		try {
-//			conexion = Conexion.conectar();
-//			statement = conexion.createStatement();
-//			statement.execute(query);
-//			resultado = statement.executeQuery(query);
-//			
-//			
-//			while(resultado.next()){
-//                Factura es = new Factura(
-//                		resultado.getInt(1),
-//                		resultado.getDate(2),
-//                		resultado.getDouble(4),
-//                		resultado.getString(5),    
-//                		buscarCliente(resultado.getInt(3)),
-//                		buscarItems(resultado.getInt(1), statement));      
-//                
-//                listaClientes.add(es);
-//            }
-//			statement.close();
-//			resultado.close();
-//			conexion.close();
-//			
-//		}catch(SQLException e){
-//          System.out.println("a ocurrido un error  y es this   " + e);
-//		}
-//		
-//		return listaClientes;
+		return selectFacturas(query);
+	}
+	
+	@Override
+	public Factura obtener(int idFactura) {
 		
-		return null;
+		String query = "SELECT * FROM tienda.Factura WHERE idFactura=" + idFactura;
+		
+		return selectFacturas(query).get(0);
 	}
 	
 	private Cliente buscarCliente(int idCliente) {
-//		String query = "SELECT * FROM tienda.Cliente WHERE idCliente=" + idCliente;
-//		try {
-//			ResultSet resultado = statement.executeQuery(query);
-//			
-//			return new Cliente(
-//					resultado.getInt(1),
-//	        		resultado.getString(2),
-//	        		resultado.getString(3),
-//	        		resultado.getDate(5),
-//	        		resultado.getString(4),
-//	        		new EstadoCivil(resultado.getInt(6)));
-//		}catch(SQLException e){
-//	          System.out.println("a ocurrido un error  y es this   " + e);
-//	          return null;
-//		}
 		
 		IDaoCliente daoCliente = new ClienteDaoImpl();
 		return daoCliente.obtener(idCliente);
 	}
 	
-	private ArrayList<Item> buscarItems(int idFactura, Statement statement) {
+	private HashMap<Integer, Integer> buscarItems(int idFactura) {
 		
-		ArrayList<Item> listaItems = new ArrayList<Item>();
+		Statement statement = null;
+		Connection conexion = null;
+		ResultSet resultado = null;
 		
-		String query = "SELECT id_item FROM tienda.Detalle_Factura "
+		HashMap<Integer, Integer> listaItems = new HashMap<Integer, Integer>();
+		
+		String query = "SELECT id_item, cantidad FROM tienda.Detalle_factura "
 				+ "WHERE id_factura=" + idFactura;
 		
-		IDaoItem daoItem = new ItemDaoImpl();
-		
-		try {
+		try {		
+			conexion = Conexion.conectar();
+			statement = conexion.createStatement();
+			statement.execute(query);
+			resultado = statement.executeQuery(query);
 			
-			ResultSet resultado = statement.executeQuery(query);
 			while(resultado.next()){
-				listaItems.add(daoItem.obtener(resultado.getInt(1)));
+				listaItems.put(resultado.getInt(1), resultado.getInt(2));
 			}
 			
+			statement.close();
+			resultado.close();
+			conexion.close();
+			
 		} catch(SQLException e){
-	          System.out.println("a ocurrido un error  y es this   " + e);
+	          System.out.println("A ocurrido un error  y es this   " + e);
 	          return null;
-		}
-		
-//		String query = "SELECT * FROM tienda.Item "
-//				+ "INNER JOIN Detalle_Factura "
-//				+ "ON tienda.Detalle_Factura.id_item = tienda.Item.idItem "
-//				+ "WHERE tienda.Detalle_Factura.id_factura = " + idFactura;
-//		try {
-//			ResultSet resultado = statement.executeQuery(query);
-//			while(resultado.next()){
-//				Item item = new Item(
-//	            		resultado.getInt(1),
-//	            		new TipoItem(resultado.getInt(2)),   
-//	            		resultado.getString(3),                		
-//	            		resultado.getDouble(4));
-//				listaItems.add(item);
-//			}
-//		}catch(SQLException e){
-//	          System.out.println("a ocurrido un error  y es this   " + e);
-//	          return null;
-//		}
-		
+		}		
 		
 		return listaItems;
 	}
@@ -165,14 +108,38 @@ public class FacturaDaoImpl implements IDaoFactura {
 	@Override
 	public boolean actualizar(Factura factura) {
 		
-		String query = "UPDATE tienda.Cliente SET "
-				+ "fecha='" + factura.getDate() + "', "
+		String query;
+		boolean registroExitoso = false;
+		
+		query = "UPDATE tienda.Factura SET "
+				+ "fecha='" + new java.sql.Date(factura.getDate().getTime())+ "', "
 				+ "cliente='" + factura.getCliente().getIdCliente() + "', "
 				+ "total='" + factura.getTotal() + "', "
 				+ "estado='" + factura.getEstado()
-				+ "' WHERE idCliente=" + factura.getIdFactura();
+				+ "' WHERE idFactura=" + factura.getIdFactura();
 		
-		return hacerQuery(query);
+		registroExitoso = hacerQuery(query);
+		
+//		HashMap<Integer, Integer> itemList = factura.getItems();
+//		
+//		for (Map.Entry<Integer, Integer> item: itemList.entrySet()) {
+//			query = "INSERT INTO tienda.Detalle_factura VALUES ( '"
+//					+ idDetalleFactura++ + "','"
+//					+ item.getKey() + "','"
+//					+ factura.getIdFactura() + "','"
+//					+ item.getValue() +  "')";
+//			
+//			query = "UPDATE tienda.Detalle_factura SET "
+//					+ "fecha='" + new java.sql.Date(factura.getDate().getTime())+ "', "
+//					+ "cliente='" + factura.getCliente().getIdCliente() + "', "
+//					+ "total='" + factura.getTotal() + "', "
+//					+ "estado='" + factura.getEstado()
+//					+ "' WHERE idFactura=" + factura.getIdFactura();
+//			
+//			registroExitoso = hacerQuery(query) && registroExitoso;			
+//		}
+		
+		return registroExitoso;
 	}
 
 	@Override
@@ -208,6 +175,41 @@ public class FacturaDaoImpl implements IDaoFactura {
 		}
 		
 		return registroExitoso;
+	}
+
+	private List<Factura> selectFacturas(String query) {
+		Statement statement = null;
+		Connection conexion = null;
+		ResultSet resultado = null;
+		
+		List<Factura> listaFacturas = new ArrayList<Factura>();
+		
+		try {
+			conexion = Conexion.conectar();
+			statement = conexion.createStatement();
+			statement.execute(query);
+			resultado = statement.executeQuery(query);
+			
+			
+			while(resultado.next()){				
+                Factura factura = new Factura(
+                		resultado.getInt(1),
+                		resultado.getDate(2),
+                		resultado.getDouble(4),
+                		resultado.getString(5),    
+                		buscarCliente(resultado.getInt(3)),
+                		buscarItems(resultado.getInt(1)));    
+                listaFacturas.add(factura);
+            }
+			statement.close();
+			resultado.close();
+			conexion.close();
+			
+		}catch(SQLException e){
+          System.out.println("A ocurrido un error  y es this   " + e);
+		}
+		
+		return listaFacturas;
 	}
 	
 }

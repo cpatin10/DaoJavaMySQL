@@ -6,6 +6,7 @@ import Dao.*;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Main {
 
@@ -20,12 +21,14 @@ public class Main {
 		
 		daoCliente.agregar(cata);
 		daoCliente.agregar(pepe);
+		
 		imprimirClientes(daoCliente);		
 
 		cata = new Cliente (0, "Cata", "Patiño", 
 				new Date(1993, 5, 4), "F", new EstadoCivil(1));		
 		
 		daoCliente.actualizar(cata);
+		
 		imprimirCliente(daoCliente.obtener(0));
 		System.out.println();
 
@@ -36,11 +39,13 @@ public class Main {
 		
 		daoItem.agregar(carne);
 		daoItem.agregar(sorpresa);
+		
 		imprimirItems(daoItem);
 		
 		carne = new Item(0, new TipoItem("Carne"), "De res", 3.0);
 		
 		daoItem.actualizar(carne);
+		
 		imprimirItem(daoItem.obtener(0));
 		System.out.println();
 		
@@ -49,12 +54,22 @@ public class Main {
 		HashMap<Integer, Integer> items1 = new HashMap<>();
 		items1.put(carne.getIdItem(), 1);
 		items1.put(sorpresa.getIdItem(), 3);
+		HashMap<Integer, Integer> items2 = new HashMap<>();
+		items2.put(carne.getIdItem(), 2);
 		
 		Factura f1 = new Factura(0, new Date(2018, 4, 5), 7.0, "pendiente", cata, items1);
+		Factura f2 = new Factura(1, new Date(2017, 12, 24), 3.0, "pagado", pepe, items2);
 		
 		daoFactura.agregar(f1);
+		daoFactura.agregar(f2);
+		
+		imprimirFacturas(daoFactura);
+		
+		imprimirFactura(daoFactura.obtener(0));
+		System.out.println();
 		
 		daoFactura.eliminar(f1.getIdFactura());
+		daoFactura.eliminar(f2.getIdFactura());
 		
 		daoCliente.eliminar(cata.getIdCliente());
 		daoCliente.eliminar(pepe.getIdCliente());
@@ -87,5 +102,20 @@ public class Main {
 
 	private static void imprimirItem(Item item) {
 		System.out.println(item.getIdItem() + " " + item.getTipo_Item().getTipo());
+	}
+	
+	public static void imprimirFacturas(IDaoFactura daoFactura) {
+		List<Factura> facturas = daoFactura.obtener();
+		for (Factura factura: facturas) {
+			imprimirFactura(factura);
+		}
+		System.out.println();
+	}
+
+	private static void imprimirFactura(Factura factura) {
+		System.out.println(factura.getIdFactura() + " " + factura.getEstado() + " Items: ");
+		for (Map.Entry<Integer, Integer> item: factura.getItems().entrySet()) {
+			System.out.println("  " + item.getKey() + " " + item.getValue());
+		}
 	}
 }
