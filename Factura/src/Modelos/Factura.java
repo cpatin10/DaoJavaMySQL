@@ -2,6 +2,7 @@ package Modelos;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 public class Factura {
 	
@@ -10,10 +11,10 @@ public class Factura {
 	private double total;
 	private String estado;
 	private Cliente cliente;
-	private ArrayList<Item> items;
+	private HashMap<Integer, Integer> items;
 	
 	public Factura(int idFactura, Date fecha, double total, 
-			String estado, Cliente cliente, ArrayList<Item> items) {
+			String estado, Cliente cliente, HashMap<Integer, Integer> items) {
 		this.idFactura = idFactura;
 		this.fecha = fecha;
 		this.total = total;
@@ -62,11 +63,11 @@ public class Factura {
 		this.cliente = cliente;
 	}
 	
-	public ArrayList<Item> getItems() {
+	public HashMap<Integer, Integer> getItems() {
 		return items;
 	}
 	
-	public void setCliente(ArrayList<Item> items) {
+	public void setCliente(HashMap<Integer, Integer> items) {
 		this.items = items;
 	}
 	

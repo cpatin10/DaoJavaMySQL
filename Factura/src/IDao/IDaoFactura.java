@@ -9,7 +9,7 @@ public interface IDaoFactura {
 	public List<Factura> obtener();
 //	public Factura obtener(int idFactura);
 	public boolean actualizar(Factura factura);
-	public boolean eliminar(Factura factura);
+	public boolean eliminar(int idFactura);
 }
 
 

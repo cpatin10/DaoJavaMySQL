@@ -4,6 +4,7 @@ import Modelos.*;
 import IDao.*;
 import Dao.*;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class Main {
@@ -11,31 +12,56 @@ public class Main {
 	public static void main(String[] args) {
 		
 		IDaoCliente daoCliente = new ClienteDaoImpl();
-		daoCliente.agregar(new Cliente(0, "Nombre", "Apellido", 
-				new Date(2018, 4, 4), "F", new EstadoCivil(0)));
-		daoCliente.agregar(new Cliente(1, "Pepe", "Pepito", 
-				new Date(2000, 3, 4), "M", new EstadoCivil(1)));
-		imprimirClientes(daoCliente);
-		daoCliente.actualizar(new Cliente (0, "Cata", "Patiño", 
-				new Date(1993, 5, 4), "F", new EstadoCivil(1)));
+		
+		Cliente cata = new Cliente(0, "Nombre", "Apellido", 
+				new Date(2018, 4, 4), "F", new EstadoCivil(0));
+		Cliente pepe = new Cliente(1, "Pepe", "Pepillo", 
+				new Date(2000, 5, 4), "M", new EstadoCivil(1));
+		
+		daoCliente.agregar(cata);
+		daoCliente.agregar(pepe);
+		imprimirClientes(daoCliente);		
+
+		cata = new Cliente (0, "Cata", "Patiño", 
+				new Date(1993, 5, 4), "F", new EstadoCivil(1));		
+		
+		daoCliente.actualizar(cata);
 		imprimirCliente(daoCliente.obtener(0));
 		System.out.println();
-		
+
 		IDaoItem daoItem = new ItemDaoImpl();
-		daoItem.agregar(new Item(0, new TipoItem(0), "Rico y delicioso", 2.5));
-		daoItem.agregar(new Item(1, new TipoItem("Otro"), "Sorpresa", 0.2));
+		
+		Item carne = new Item(0, new TipoItem(0), "Rico y delicioso", 2.5);
+		Item sorpresa = new Item(1, new TipoItem("Otro"), "Sorpresa", 0.2);
+		
+		daoItem.agregar(carne);
+		daoItem.agregar(sorpresa);
 		imprimirItems(daoItem);
-		daoItem.actualizar(new Item(0, new TipoItem("Carne"), "De res", 3.0));
+		
+		carne = new Item(0, new TipoItem("Carne"), "De res", 3.0);
+		
+		daoItem.actualizar(carne);
 		imprimirItem(daoItem.obtener(0));
 		System.out.println();
 		
-//		IDaoFactura daoFactura = new FacturaDaoImpl();
-//		daoFactura.agregar(new Factura(0, new Date(2018, 4, 4), 10.2, "Deuda", 0,  ));
+		IDaoFactura daoFactura = new FacturaDaoImpl();
 		
-		daoCliente.eliminar(0);
-		daoCliente.eliminar(1);
-		daoItem.eliminar(0);
-		daoItem.eliminar(1);
+		HashMap<Integer, Integer> items1 = new HashMap<>();
+		items1.put(carne.getIdItem(), 1);
+		items1.put(sorpresa.getIdItem(), 3);
+		
+		Factura f1 = new Factura(0, new Date(2018, 4, 5), 7.0, "pendiente", cata, items1);
+		
+		daoFactura.agregar(f1);
+		
+		daoFactura.eliminar(f1.getIdFactura());
+		
+		daoCliente.eliminar(cata.getIdCliente());
+		daoCliente.eliminar(pepe.getIdCliente());
+		
+		daoItem.eliminar(carne.getIdItem());
+		daoItem.eliminar(sorpresa.getIdItem());
+		
 	}
 	
 	public static void imprimirClientes(IDaoCliente daoCliente) {
